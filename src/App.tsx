@@ -1,7 +1,8 @@
 import { FunctionComponent, useState } from "react";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 
 import { CREATE_RECIPE } from "./graphql/mutations/CreateRecipe";
+import { RECIPES } from "./graphql/queries/Recipes";
 
 import "./App.css";
 
@@ -12,35 +13,7 @@ const App: FunctionComponent = () => {
   const [description, setDescription] = useState<string>("");
   const [ingredients, setIngredients] = useState<Array<string>>([]);
 
-  const [createRecipe, { loading }] = useMutation(CREATE_RECIPE, {
-    update(cache, { data: { createRecipe } }) {
-      cache.modify({
-        fields: {
-          recipes(existingrecipes = []) {
-            const newRecipeRef = cache.writeFragment({
-              data: createRecipe,
-              fragment: gql`
-                fragment Response on ResponseType {
-                  recipe {
-                    id
-                    name
-                    description
-                    ingredients
-                  }
-                  error {
-                    message
-                  }
-                  success
-                }
-              `,
-            });
-
-            return [...existingrecipes, newRecipeRef];
-          },
-        },
-      });
-    },
-  });
+  const [createRecipe, { loading }] = useMutation(CREATE_RECIPE);
 
   const handleIngredients = (value: string) => {
     let ingredientsArray = value.split(",");
@@ -56,6 +29,18 @@ const App: FunctionComponent = () => {
         name,
         description,
         ingredients,
+      },
+      update: (cache, { data }) => {
+        const recipesData: any = cache.readQuery({
+          query: RECIPES,
+        });
+
+        cache.writeQuery({
+          query: RECIPES,
+          data: {
+            recipes: [...recipesData.recipes, data.createRecipe],
+          },
+        });
       },
     });
   };

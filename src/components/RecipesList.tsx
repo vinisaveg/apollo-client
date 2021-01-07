@@ -1,13 +1,44 @@
 import { FunctionComponent } from "react";
 
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 
 import { RECIPES } from "../graphql/queries/Recipes";
+import { DELETE_RECIPE } from "../graphql/mutations/DeleteRecipe";
+import { RecipesData } from "../types/RecipesData";
+import { Recipe } from "../types/Recipe";
 
 const RecipesList: FunctionComponent = () => {
   const { loading, error, data } = useQuery(RECIPES);
 
-  const handleDelete = async (id: string) => {};
+  const [deleteRecipe] = useMutation(DELETE_RECIPE);
+
+  const handleDelete = async (id: string) => {
+    // deleteRecipe({
+    //   variables: {
+    //     id,
+    //   },
+    //   update: (cache, { data }) => {
+    //     const recipesData = cache.readQuery<RecipesData>({
+    //       query: RECIPES,
+    //     });
+    //     if (recipesData?.recipes) {
+    //       let deletedRecipeIndex = recipesData?.recipes.findIndex(
+    //         (recipe: Recipe) => recipe.id === id
+    //       );
+    //       let updatedRecipesData = recipesData?.recipes.splice(
+    //         deletedRecipeIndex,
+    //         1
+    //       );
+    //       cache.writeQuery({
+    //         query: RECIPES,
+    //         data: {
+    //           recipes: updatedRecipesData,
+    //         },
+    //       });
+    //     }
+    //   },
+    // });
+  };
 
   if (loading) return <span>Buscando...</span>;
 
