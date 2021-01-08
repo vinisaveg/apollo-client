@@ -2,15 +2,18 @@ import { FunctionComponent } from "react";
 
 import { useQuery, useMutation } from "@apollo/client";
 
-import { RECIPES } from "../graphql/queries/Recipes";
-import { DELETE_RECIPE } from "../graphql/mutations/DeleteRecipe";
 import { RecipesData } from "../types/RecipesData";
 import { Recipe } from "../types/Recipe";
+
+import { RECIPES } from "../graphql/queries/Recipes";
+import { DELETE_RECIPE } from "../graphql/mutations/DeleteRecipe";
+import { UPDATE_RECIPE } from "../graphql/mutations/UpdateRecipe";
 
 const RecipesList: FunctionComponent = () => {
   const { loading, error, data } = useQuery(RECIPES);
 
   const [deleteRecipe] = useMutation(DELETE_RECIPE);
+  const [updateRecipe] = useMutation(UPDATE_RECIPE);
 
   const handleDelete = async (id: string) => {
     deleteRecipe({
@@ -40,6 +43,14 @@ const RecipesList: FunctionComponent = () => {
     });
   };
 
+  const handleUpdate = (id: string) => {
+    updateRecipe({
+      variables: {
+        id,
+      },
+    });
+  };
+
   if (loading) return <span>Buscando...</span>;
 
   if (error) return <span>{error.message}</span>;
@@ -60,6 +71,18 @@ const RecipesList: FunctionComponent = () => {
             }}
           >
             Deletar
+          </span>
+
+          <span
+            onClick={() => handleUpdate(recipe.id)}
+            style={{
+              fontWeight: 600,
+              color: "blue",
+              marginLeft: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Atualizar
           </span>
         </li>
       ))}
