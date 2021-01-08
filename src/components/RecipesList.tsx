@@ -13,31 +13,31 @@ const RecipesList: FunctionComponent = () => {
   const [deleteRecipe] = useMutation(DELETE_RECIPE);
 
   const handleDelete = async (id: string) => {
-    // deleteRecipe({
-    //   variables: {
-    //     id,
-    //   },
-    //   update: (cache, { data }) => {
-    //     const recipesData = cache.readQuery<RecipesData>({
-    //       query: RECIPES,
-    //     });
-    //     if (recipesData?.recipes) {
-    //       let deletedRecipeIndex = recipesData?.recipes.findIndex(
-    //         (recipe: Recipe) => recipe.id === id
-    //       );
-    //       let updatedRecipesData = recipesData?.recipes.splice(
-    //         deletedRecipeIndex,
-    //         1
-    //       );
-    //       cache.writeQuery({
-    //         query: RECIPES,
-    //         data: {
-    //           recipes: updatedRecipesData,
-    //         },
-    //       });
-    //     }
-    //   },
-    // });
+    deleteRecipe({
+      variables: {
+        id,
+      },
+      update: (cache, { data }) => {
+        const recipesData = cache.readQuery<RecipesData>({
+          query: RECIPES,
+        });
+
+        if (recipesData?.recipes !== undefined) {
+          let filteredRecipesData = recipesData.recipes.filter(
+            (recipe: Recipe) => {
+              return recipe.id !== id;
+            }
+          );
+
+          cache.writeQuery({
+            query: RECIPES,
+            data: {
+              recipes: filteredRecipesData,
+            },
+          });
+        }
+      },
+    });
   };
 
   if (loading) return <span>Buscando...</span>;
