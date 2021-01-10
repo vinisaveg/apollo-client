@@ -1,8 +1,8 @@
 import { FunctionComponent, useState } from "react";
-import { useMutation } from "@apollo/client";
 
-import { CREATE_RECIPE } from "./graphql/mutations/CreateRecipe";
 import { RECIPES } from "./graphql/queries/Recipes";
+
+import { useCreateRecipeMutation } from "./generated/graphql";
 
 import "./App.css";
 
@@ -13,7 +13,7 @@ const App: FunctionComponent = () => {
   const [description, setDescription] = useState<string>("");
   const [ingredients, setIngredients] = useState<Array<string>>([]);
 
-  const [createRecipe, { loading }] = useMutation(CREATE_RECIPE);
+  const [createRecipe, { loading }] = useCreateRecipeMutation();
 
   const handleIngredients = (value: string) => {
     let ingredientsArray = value.split(",");
@@ -38,7 +38,7 @@ const App: FunctionComponent = () => {
         cache.writeQuery({
           query: RECIPES,
           data: {
-            recipes: [...recipesData.recipes, data.createRecipe],
+            recipes: [...recipesData.recipes, data?.createRecipe],
           },
         });
       },

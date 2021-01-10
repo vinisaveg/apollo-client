@@ -1,19 +1,20 @@
 import { FunctionComponent } from "react";
 
-import { useQuery, useMutation } from "@apollo/client";
-
 import { RecipesData } from "../types/RecipesData";
 import { Recipe } from "../types/Recipe";
 
-import { RECIPES } from "../graphql/queries/Recipes";
-import { DELETE_RECIPE } from "../graphql/mutations/DeleteRecipe";
-import { UPDATE_RECIPE } from "../graphql/mutations/UpdateRecipe";
+import {
+  GetRecipesDocument,
+  useDeleteRecipeMutation,
+  useUpdateRecipeMutation,
+  useGetRecipesQuery,
+} from "../generated/graphql";
 
 const RecipesList: FunctionComponent = () => {
-  const { loading, error, data } = useQuery(RECIPES);
+  const { loading, error, data } = useGetRecipesQuery();
 
-  const [deleteRecipe] = useMutation(DELETE_RECIPE);
-  const [updateRecipe] = useMutation(UPDATE_RECIPE);
+  const [deleteRecipe] = useDeleteRecipeMutation();
+  const [updateRecipe] = useUpdateRecipeMutation();
 
   const handleDelete = async (id: string) => {
     deleteRecipe({
@@ -22,7 +23,7 @@ const RecipesList: FunctionComponent = () => {
       },
       update: (cache, { data }) => {
         const recipesData = cache.readQuery<RecipesData>({
-          query: RECIPES,
+          query: GetRecipesDocument,
         });
 
         if (recipesData?.recipes !== undefined) {
@@ -33,7 +34,7 @@ const RecipesList: FunctionComponent = () => {
           );
 
           cache.writeQuery({
-            query: RECIPES,
+            query: GetRecipesDocument,
             data: {
               recipes: filteredRecipesData,
             },
